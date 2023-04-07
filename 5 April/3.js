@@ -42,6 +42,8 @@ db.assignment2.aggregate([
 // { _id: 'WY', city: 'THAYNE', pop: 33107 },
 // { _id: 'MO', city: 'SPRINGFIELD', pop: 54994 }
 
+//correct
+
 db.assignment2.aggregate([
   {
     $sort: {
@@ -90,25 +92,30 @@ db.assignment2.aggregate([
         state: "$state",
         city: "$city",
       },
-      population: { $sum: "$pop" },
+      pop: { $sum: "$pop" },
     },
   },
   {
     $group: {
       _id: "$_id.state",
-      avgPopulation: { $avg: "$population" },
+      avg_pop: { $avg: "$population" },
     },
   },
 ]);
 
 db.assignment2.aggregate([
   {
-    $group: {
-      _id: {
-        state: "$state",
-        city: "$city",
-      },
-      population: { $sum: "$pop" },
+    $sort: {
+      pop: 1,
+    },
+  },
+  {
+    $limit: 1,
+  },
+  {
+    $project: {
+      city: 1,
+      pop:1
     },
   },
 ]);
