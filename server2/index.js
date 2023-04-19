@@ -6,6 +6,7 @@ const { authenticate } = require("./middleware/authenticate");
 const { Blacklist } = require("./models/blacklist.model");
 const jwt = require("jsonwebtoken");
 const { UserModel } = require("./models/user.model");
+const { checkRole } = require("./middleware/authorization");
 
 const app = express();
 
@@ -48,11 +49,40 @@ app.post("/refresh", async (req, res) => {
       expires: new Date(Date.now() + 3600000),
     });
 
-    res.status(200).json({msg:"successfully created token with refresh token"})
+    res
+      .status(200)
+      .json({ msg: "successfully created token with refresh token" });
   } catch (error) {
     res.status(400).json({ msg: "error", error: error.message });
   }
 });
+
+app.get(
+  "/comments",
+  authenticate,
+  checkRole("User", "Admin", "Super_Admin"),
+  (req, res) => {
+    res.send("all posts");
+  }
+);
+
+app.patch(
+  "/comments",
+  authenticate,
+  checkRole("Admin", "Super_Admin"),
+  (req, res) => {
+    res.send("Comments updated");
+  }
+);
+
+app.delete(
+  "/comments",
+  authenticate,
+  checkRole("Admin", "Super_Admin"),
+  (req, res) => {
+    res.send("Comments deleted");
+  }
+);
 
 app.listen(4000, async () => {
   try {
