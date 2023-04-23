@@ -5,20 +5,66 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Voting</title>
 </head>
+<style>
+    #container div {
+        display: flex;
+        gap: 0 30px;
+    }
+
+    #container button {
+        height: 40px;
+    }
+</style>
 
 <body>
-    <input type="text" name="" id="">
-    <button>Clcik</button>
+    <input type="text" name="" id="name" placeholder="Enter your name" required>
+    <button>Submit</button>
+
+    <div id="container">
+    </div>
 </body>
 <script>
     const socket = new WebSocket("ws://localhost:4000")
+    const name = document.querySelector("#name");
+    let container = document.querySelector("#container");
 
     socket.onmessage = ({ data }) => {
         data = JSON.parse(data);
+        appendCandidates(data)
         console.log(data)
     }
+
+    function appendCandidates(data) {
+        container.innerHTML = ""
+
+        data.forEach(el => {
+            let arr=el.voters
+            container.innerHTML += `
+            <div>
+                <h2>${el.name}</h2>
+                <p>${el.votes}</p>
+                <button onclick="vote(${el.id},${arr})">vote</button>
+            </div>
+            `
+        });
+    }
+
+    function vote(id, voters) {
+        console.log(id, voters)
+        console.log(name.value)
+        if (name.value === "") {
+            alert("Enter your name first")
+        } else if (voters && voters.includes(name.value)) {
+            alert("already voted")
+        } else {
+            socket.send(`${id}|${name.value}`)
+        }
+    }
+
+
+
 </script>
 
 </html>
