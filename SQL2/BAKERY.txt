@@ -1,0 +1,1 @@
+SELECT c.email, COUNT(*) as num_orders FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE YEAR(o.order_placed_date) = 2016 GROUP BY c.email ORDER BY num_orders DESC;
